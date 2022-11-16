@@ -1,0 +1,122 @@
+﻿@model IEnumerable<CodeFirstDemo.Models.Product>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.ProductID }) |
+                @Html.ActionLink("Details", "Details", new { id = item.ProductID }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.ProductID })
+            </td>
+        </tr>
+    }
+
+</table>
+<h2>Busqueda  Producto  JQ/AJAX</h2>
+
+<input type="text" id="txtName" />
+<input type="button" value="Buscar" id="btnBuscarProduct">
+<input type="button" value="Limpiar" id="btnClean">
+<br />
+<br />
+<table id="tblProducts" class="table table-bordered table-striped table-responsive table-hover">
+    <thead>
+        <tr>
+            <th align="left" class="productth">ID</th>
+            <th align="left" class="productth">Name</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+@section Scripts
+{
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#btnClean").click((function () {
+               // $("#tblCourses tbody tr").remove();
+            }));
+            $("#txtName").keyup((function () {
+
+            var product = $(this).val();
+
+            $("#tblProducts tbody tr").remove();
+            $.ajax({
+            type: 'POST',
+            url: '@Url.Action("getProducts")',
+            dataType: 'json',
+            data: { name: product },
+                success: function (data) {
+                $.each(data, function (i, item) {
+                    var rows = "<tr>"
+                        + "<td class='prtoducttd'>" + item.ProductID + "</td>"
+                        + "<td class='prtoducttd'>" + item.Name + "</td>"
+
+
+                    + "</tr>";
+                    $('#tblProducts tbody').append(rows);
+                });
+            },
+            error: function (ex) {
+                var r = jQuery.parseJSON(response.responseText);
+                alert("Message: " + r.Message);
+                alert("StackTrace: " + r.StackTrace);
+                alert("ExceptionType: " + r.ExceptionType);
+            }
+            });
+            }));
+
+            $("#btnBuscarProduct").click((function () {
+            var course = $("#txtName").val();
+            $("#tblProducts tbody tr").remove();
+            $.ajax({
+            type: 'POST',
+            url: '@Url.Action("getProducts")',
+            dataType: 'json',
+            data: { name: course },
+                success: function (data) {
+                $.each(data, function (i, item) {
+                    var rows = "<tr>"
+                        + "<td class='prtoducttd'>" + item.ProductID + "</td>"
+                        + "<td class='prtoducttd'>" + item.Name + "</td>"
+                    + "</tr>";
+                    $('#tblProducts tbody').append(rows);
+                });
+            },
+            error: function (ex) {
+                var r = jQuery.parseJSON(response.responseText);
+                alert("Message: " + r.Message);
+                alert("StackTrace: " + r.StackTrace);
+                alert("ExceptionType: " + r.ExceptionType);
+            }
+        });
+            }));
+
+
+
+        });
+    </script>
+}
